@@ -9,4 +9,7 @@ $routes->group('api', ['namespace' => 'App\Controllers\Api'], static function (R
     $routes->post('auth/login', 'AuthController::login');
 
     $routes->get('me', 'AuthController::me', ['filter' => 'jwt']);
+
+    $routes->get('medecins', 'MedecinController::search', ['filter' => 'jwt']);
+    $routes->get('specialites', 'SpecialiteController::index');
 });

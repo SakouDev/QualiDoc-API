@@ -15,8 +15,7 @@ class MedecinModel extends Model
     /**
      * Recherche "un seul champ" façon Doctolib : q est comparé en préfixe
      * (LIKE 'terme%', donc utilisable par un index classique) sur nom,
-     * prénom et spécialité. specialite_id reste un filtre exact séparé,
-     * pour un futur menu déroulant.
+     * prénom et spécialité.
      */
     public function search(?string $q): array
     {

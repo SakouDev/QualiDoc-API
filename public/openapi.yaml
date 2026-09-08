@@ -1,0 +1,162 @@
+openapi: 3.0.3
+info:
+  title: QualiDoc API
+  description: API de prise de rendez-vous médicaux (test technique QualiJob).
+  version: "1.0"
+servers:
+  - url: http://localhost:8080/api
+    description: Dev local
+
+tags:
+  - name: Auth
+    description: Inscription, connexion, token JWT
+
+paths:
+  /auth/register:
+    post:
+      tags: [Auth]
+      summary: Créer un compte patient
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RegisterRequest'
+      responses:
+        '201':
+          description: Compte créé
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthResponse'
+        '400':
+          description: Erreur de validation (email déjà utilisé, champs manquants...)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /auth/login:
+    post:
+      tags: [Auth]
+      summary: Se connecter et obtenir un token JWT
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoginRequest'
+      responses:
+        '200':
+          description: Connexion réussie
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthResponse'
+        '401':
+          description: Identifiants invalides
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /me:
+    get:
+      tags: [Auth]
+      summary: Récupérer le profil du patient connecté
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Profil du patient
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Patient'
+        '401':
+          description: Token manquant, invalide ou expiré
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: >
+        Token obtenu via /auth/login ou /auth/register, valide 15 jours.
+        À envoyer dans l'en-tête `Authorization: Bearer <token>`.
+
+  schemas:
+    RegisterRequest:
+      type: object
+      required: [nom, prenom, email, password]
+      properties:
+        nom:
+          type: string
+          example: Dupont
+        prenom:
+          type: string
+          example: Luc
+        email:
+          type: string
+          format: email
+          example: luc.dupont@example.com
+        password:
+          type: string
+          format: password
+          minLength: 8
+          example: password123
+
+    LoginRequest:
+      type: object
+      required: [email, password]
+      properties:
+        email:
+          type: string
+          format: email
+        password:
+          type: string
+          format: password
+
+    Patient:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        nom:
+          type: string
+        prenom:
+          type: string
+        email:
+          type: string
+          format: email
+        admin:
+          type: boolean
+
+    AuthResponse:
+      type: object
+      properties:
+        token:
+          type: string
+          description: JWT signé HS256, valide 15 jours
+        patient:
+          $ref: '#/components/schemas/Patient'
+
+    ErrorResponse:
+      type: object
+      properties:
+        status:
+          type: integer
+          example: 400
+        error:
+          type: integer
+          example: 400
+        messages:
+          type: object
+          additionalProperties:
+            type: string

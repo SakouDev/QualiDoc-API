@@ -28,6 +28,16 @@ to your `app` folder. The affected files can be copied or merged from
 Copy `env` to `.env` and tailor for your app, specifically the baseURL
 and any database settings.
 
+## Base de données
+
+Créer la base puis importer `database/schema.sql` **en forçant le charset
+utf8mb4 côté client** — sans ça, les accents (ex: "Généraliste") sont
+mal importés (double encodage UTF-8) :
+
+```
+mysql -u root -p --default-character-set=utf8mb4 qualidoc < database/schema.sql
+```
+
 ## Important Change with index.php
 
 `index.php` is no longer in the root of the project! It has been moved inside the *public* folder,

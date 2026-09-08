@@ -33,10 +33,11 @@ CREATE TABLE patients (
 
 -- =========================================
 -- Table : medecins
--- FULLTEXT sur (nom, prenom) pour la recherche
--- multi-critères optimisée (point 5.3 du sujet).
--- La spécialité est un filtre séparé (specialite_id),
--- pas incluse dans le FULLTEXT.
+-- Recherche multi-critères optimisée (point 5.3 du sujet) :
+-- un champ de recherche unique côté front compare en préfixe
+-- (LIKE 'terme%') sur nom, prenom et specialites.nom, donc des
+-- index classiques sur nom/prenom suffisent (pas de FULLTEXT :
+-- un seul mot par colonne, pas besoin de chercher en plein milieu).
 -- =========================================
 DROP TABLE IF EXISTS medecins;
 CREATE TABLE medecins (
@@ -47,7 +48,8 @@ CREATE TABLE medecins (
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   FOREIGN KEY (specialite_id) REFERENCES specialites(id),
   INDEX idx_medecins_specialite (specialite_id),
-  FULLTEXT INDEX ft_medecins_nom (nom, prenom)
+  INDEX idx_medecins_nom (nom),
+  INDEX idx_medecins_prenom (prenom)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- =========================================

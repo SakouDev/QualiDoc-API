@@ -10,6 +10,8 @@ servers:
 tags:
   - name: Auth
     description: Inscription, connexion, token JWT
+  - name: Medecins
+    description: Recherche de médecins et liste des spécialités
 
 paths:
   /auth/register:
@@ -80,6 +82,49 @@ paths:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
 
+  /medecins:
+    get:
+      tags: [Medecins]
+      summary: Rechercher des médecins (nom/prénom + spécialité)
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: q
+          in: query
+          description: Recherche plein texte sur nom, prénom et spécialité (préfixe par mot, tous les mots combinés en ET)
+          schema:
+            type: string
+          example: jean dur
+      responses:
+        '200':
+          description: Liste des médecins correspondants
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Medecin'
+        '401':
+          description: Token manquant, invalide ou expiré
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /specialites:
+    get:
+      tags: [Medecins]
+      summary: Lister les spécialités
+      responses:
+        '200':
+          description: Liste des spécialités
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Specialite'
+
 components:
   securitySchemes:
     bearerAuth:
@@ -146,6 +191,35 @@ components:
           description: JWT signé HS256, valide 15 jours
         patient:
           $ref: '#/components/schemas/Patient'
+
+    Medecin:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        nom:
+          type: string
+          example: Durand
+        prenom:
+          type: string
+          example: Jean
+        specialite_id:
+          type: integer
+          example: 1
+        specialite_nom:
+          type: string
+          example: Généraliste
+
+    Specialite:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        nom:
+          type: string
+          example: Généraliste
 
     ErrorResponse:
       type: object

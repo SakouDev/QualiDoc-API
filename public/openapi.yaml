@@ -12,6 +12,10 @@ tags:
     description: Inscription, connexion, token JWT
   - name: Medecins
     description: Recherche de médecins et liste des spécialités
+  - name: Admin - Médecins
+    description: Créer/modifier/supprimer un médecin (réservé aux comptes admin)
+  - name: Admin - Spécialités
+    description: Créer/modifier/supprimer une spécialité (réservé aux comptes admin)
 
 paths:
   /auth/register:
@@ -125,6 +129,180 @@ paths:
                 items:
                   $ref: '#/components/schemas/Specialite'
 
+  /admin/medecins:
+    post:
+      tags: [Admin - Médecins]
+      summary: Créer un médecin
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MedecinRequest'
+      responses:
+        '201':
+          description: Médecin créé
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Medecin'
+        '400':
+          description: Erreur de validation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Compte non admin
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /admin/medecins/{id}:
+    put:
+      tags: [Admin - Médecins]
+      summary: Modifier un médecin
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MedecinRequest'
+      responses:
+        '200':
+          description: Médecin modifié
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Medecin'
+        '404':
+          description: Médecin introuvable
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+    delete:
+      tags: [Admin - Médecins]
+      summary: Supprimer un médecin
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Médecin supprimé
+        '404':
+          description: Médecin introuvable
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '409':
+          description: Ce médecin a des rendez-vous ou disponibilités enregistrés
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /admin/specialites:
+    post:
+      tags: [Admin - Spécialités]
+      summary: Créer une spécialité
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SpecialiteRequest'
+      responses:
+        '201':
+          description: Spécialité créée
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Specialite'
+        '400':
+          description: Erreur de validation (nom déjà utilisé)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /admin/specialites/{id}:
+    put:
+      tags: [Admin - Spécialités]
+      summary: Modifier une spécialité
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SpecialiteRequest'
+      responses:
+        '200':
+          description: Spécialité modifiée
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Specialite'
+        '404':
+          description: Spécialité introuvable
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+    delete:
+      tags: [Admin - Spécialités]
+      summary: Supprimer une spécialité
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Spécialité supprimée
+        '404':
+          description: Spécialité introuvable
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '409':
+          description: Des médecins ont encore cette spécialité
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
 components:
   securitySchemes:
     bearerAuth:
@@ -220,6 +398,28 @@ components:
         nom:
           type: string
           example: Généraliste
+
+    MedecinRequest:
+      type: object
+      required: [nom, prenom, specialite_id]
+      properties:
+        nom:
+          type: string
+          example: Durand
+        prenom:
+          type: string
+          example: Jean
+        specialite_id:
+          type: integer
+          example: 1
+
+    SpecialiteRequest:
+      type: object
+      required: [nom]
+      properties:
+        nom:
+          type: string
+          example: Ophtalmologue
 
     ErrorResponse:
       type: object

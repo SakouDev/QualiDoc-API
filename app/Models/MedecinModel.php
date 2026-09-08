@@ -12,6 +12,12 @@ class MedecinModel extends Model
     protected $useTimestamps = false;
     protected $allowedFields = ['nom', 'prenom', 'specialite_id'];
 
+    protected $validationRules = [
+        'nom' => 'required|max_length[100]',
+        'prenom' => 'required|max_length[100]',
+        'specialite_id' => 'required|is_natural_no_zero|is_not_unique[specialites.id]',
+    ];
+
     /**
      * Recherche "un seul champ" façon Doctolib : q est comparé en préfixe
      * (LIKE 'terme%', donc utilisable par un index classique) sur nom,

@@ -11,4 +11,8 @@ class SpecialiteModel extends Model
     protected $returnType = 'array';
     protected $useTimestamps = false;
     protected $allowedFields = ['nom'];
+
+    protected $validationRules = [
+        'nom' => 'required|max_length[100]',
+    ];
 }

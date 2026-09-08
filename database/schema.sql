@@ -108,8 +108,8 @@ INSERT INTO medecins (nom, prenom, specialite_id) VALUES
 -- mot de passe en clair pour les 2 comptes de test : "password"
 -- hash généré avec password_hash('password', PASSWORD_DEFAULT) côté PHP
 INSERT INTO patients (nom, prenom, email, password_hash, admin) VALUES
-  ('Dupont', 'Luc', 'luc.dupont@example.com', '$2y$10$92I2VoiG/A2GfjP0Qw2VZOZz1H7v8dq7Ecd7nUq0X8zj3s5N0oW9K', FALSE),
-  ('Admin', 'Qualidoc', 'admin@qualidoc.fr', '$2y$10$92I2VoiG/A2GfjP0Qw2VZOZz1H7v8dq7Ecd7nUq0X8zj3s5N0oW9K', TRUE);
+  ('Dupont', 'Luc', 'luc.dupont@example.com', '$2y$12$psTmuGnD.Rmx8jQSmod9zuizpqzmVHrRN08i7Uz0WmZsdyWMKc.8u', FALSE),
+  ('Admin', 'Qualidoc', 'admin@qualidoc.fr', '$2y$12$psTmuGnD.Rmx8jQSmod9zuizpqzmVHrRN08i7Uz0WmZsdyWMKc.8u', TRUE);
 
 INSERT INTO disponibilites (medecin_id, date_dispo, heure_debut, heure_fin, duree_creneau) VALUES
   (1, '2026-09-15', '09:00:00', '12:00:00', 20),

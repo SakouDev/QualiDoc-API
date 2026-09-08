@@ -42,6 +42,13 @@
 # database.tests.hostname = localhost
 # database.tests.database = ci4_test
 # database.tests.username = root
+
+#--------------------------------------------------------------------
+# JWT AUTH
+#--------------------------------------------------------------------
+
+# JWT_SECRET = change-me-to-a-random-secret
+# JWT_EXPIRY = 1296000
 # database.tests.password = root
 # database.tests.DBDriver = MySQLi
 # database.tests.DBPrefix =

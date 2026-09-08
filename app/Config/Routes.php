@@ -11,6 +11,7 @@ $routes->group('api', ['namespace' => 'App\Controllers\Api'], static function (R
     $routes->get('me', 'AuthController::me', ['filter' => 'jwt']);
 
     $routes->get('medecins', 'MedecinController::search', ['filter' => 'jwt']);
+    $routes->get('medecins/(:num)/creneaux', 'MedecinController::creneaux/$1', ['filter' => 'jwt']);
     $routes->get('specialites', 'SpecialiteController::index');
 
     $routes->post('rendez-vous', 'RendezVousController::create', ['filter' => 'jwt']);
@@ -27,5 +28,9 @@ $routes->group('api', ['namespace' => 'App\Controllers\Api'], static function (R
         $routes->delete('specialites/(:num)', 'SpecialiteController::delete/$1');
 
         $routes->get('rendez-vous', 'RendezVousController::adminIndex');
+
+        $routes->get('disponibilites', 'DisponibiliteController::index');
+        $routes->post('disponibilites', 'DisponibiliteController::create');
+        $routes->delete('disponibilites/(:num)', 'DisponibiliteController::delete/$1');
     });
 });

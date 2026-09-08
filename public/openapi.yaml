@@ -16,6 +16,10 @@ tags:
     description: Créer/modifier/supprimer un médecin (réservé aux comptes admin)
   - name: Admin - Spécialités
     description: Créer/modifier/supprimer une spécialité (réservé aux comptes admin)
+  - name: Rendez-vous
+    description: Prise de rendez-vous, historique et annulation (patient connecté)
+  - name: Admin - Rendez-vous
+    description: Visualisation de tous les rendez-vous avec filtres (réservé aux comptes admin)
 
 paths:
   /auth/register:
@@ -128,6 +132,134 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/Specialite'
+
+  /rendez-vous:
+    post:
+      tags: [Rendez-vous]
+      summary: Prendre un rendez-vous
+      description: >
+        Format d'échange front → API pour date_heure : `Y-m-d H:i:s`
+        (ex: "2026-10-01 10:00:00"), doit être dans le futur.
+        Le patient est déduit du token, pas du body.
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RendezVousRequest'
+      responses:
+        '201':
+          description: Rendez-vous créé
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RendezVous'
+        '400':
+          description: Erreur de validation (médecin inexistant, date passée, format invalide...)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '409':
+          description: Ce créneau est déjà pris pour ce médecin
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+    get:
+      tags: [Rendez-vous]
+      summary: Lister mes rendez-vous (historique + à venir)
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Liste des rendez-vous du patient connecté, du plus récent au plus ancien
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/RendezVous'
+
+  /rendez-vous/{id}:
+    delete:
+      tags: [Rendez-vous]
+      summary: Annuler un rendez-vous
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Rendez-vous annulé (statut passé à "annule")
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RendezVous'
+        '404':
+          description: Rendez-vous introuvable (ou n'appartenant pas au patient connecté)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '409':
+          description: Ce rendez-vous n'est plus annulable (déjà annulé ou honoré)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /admin/rendez-vous:
+    get:
+      tags: [Admin - Rendez-vous]
+      summary: Lister tous les rendez-vous, avec filtres
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: medecin_id
+          in: query
+          schema:
+            type: integer
+        - name: patient_id
+          in: query
+          schema:
+            type: integer
+        - name: statut
+          in: query
+          schema:
+            type: string
+            enum: [confirme, annule, honore]
+        - name: date_from
+          in: query
+          description: Format Y-m-d H:i:s
+          schema:
+            type: string
+        - name: date_to
+          in: query
+          description: Format Y-m-d H:i:s
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Liste des rendez-vous correspondants
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/RendezVous'
+        '400':
+          description: date_from ou date_to mal formaté
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
 
   /admin/medecins:
     post:
@@ -420,6 +552,53 @@ components:
         nom:
           type: string
           example: Ophtalmologue
+
+    RendezVousRequest:
+      type: object
+      required: [medecin_id, date_heure]
+      properties:
+        medecin_id:
+          type: integer
+          example: 1
+        date_heure:
+          type: string
+          example: "2026-10-01 10:00:00"
+
+    RendezVous:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        patient_id:
+          type: integer
+          example: 4
+        medecin_id:
+          type: integer
+          example: 1
+        date_heure:
+          type: string
+          example: "2026-10-01 10:00:00"
+        statut:
+          type: string
+          enum: [confirme, annule, honore]
+        medecin_nom:
+          type: string
+          example: Durand
+        medecin_prenom:
+          type: string
+          example: Jean
+        specialite_nom:
+          type: string
+          example: Généraliste
+        patient_nom:
+          type: string
+          description: Présent uniquement sur /admin/rendez-vous
+          example: Vigneron
+        patient_prenom:
+          type: string
+          description: Présent uniquement sur /admin/rendez-vous
+          example: Luc
 
     ErrorResponse:
       type: object

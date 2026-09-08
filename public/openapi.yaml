@@ -20,6 +20,8 @@ tags:
     description: Prise de rendez-vous, historique et annulation (patient connecté)
   - name: Admin - Rendez-vous
     description: Visualisation de tous les rendez-vous avec filtres (réservé aux comptes admin)
+  - name: Admin - Disponibilités
+    description: Déclarer les créneaux disponibles d'un médecin (réservé aux comptes admin)
 
 paths:
   /auth/register:
@@ -114,6 +116,47 @@ paths:
                   $ref: '#/components/schemas/Medecin'
         '401':
           description: Token manquant, invalide ou expiré
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /medecins/{id}/creneaux:
+    get:
+      tags: [Medecins]
+      summary: Lister les créneaux d'un médecin pour une date (disponible/pris)
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+        - name: date
+          in: query
+          required: true
+          description: Format Y-m-d
+          schema:
+            type: string
+          example: "2026-10-10"
+      responses:
+        '200':
+          description: Liste des créneaux (vide si aucune disponibilité déclarée ce jour-là)
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Creneau'
+        '400':
+          description: Paramètre date manquant ou mal formaté
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Médecin introuvable
           content:
             application/json:
               schema:
@@ -256,6 +299,74 @@ paths:
                   $ref: '#/components/schemas/RendezVous'
         '400':
           description: date_from ou date_to mal formaté
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /admin/disponibilites:
+    get:
+      tags: [Admin - Disponibilités]
+      summary: Lister les disponibilités déclarées pour un médecin
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: medecin_id
+          in: query
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Liste des disponibilités
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Disponibilite'
+    post:
+      tags: [Admin - Disponibilités]
+      summary: Déclarer une plage de disponibilité pour un médecin
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DisponibiliteRequest'
+      responses:
+        '201':
+          description: Disponibilité créée
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Disponibilite'
+        '400':
+          description: Erreur de validation (médecin inexistant, heure_fin avant heure_debut...)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /admin/disponibilites/{id}:
+    delete:
+      tags: [Admin - Disponibilités]
+      summary: Supprimer une disponibilité
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Disponibilité supprimée
+        '404':
+          description: Disponibilité introuvable
           content:
             application/json:
               schema:
@@ -599,6 +710,58 @@ components:
           type: string
           description: Présent uniquement sur /admin/rendez-vous
           example: Luc
+
+    Creneau:
+      type: object
+      properties:
+        date_heure:
+          type: string
+          example: "2026-10-10 09:30:00"
+        disponible:
+          type: boolean
+
+    DisponibiliteRequest:
+      type: object
+      required: [medecin_id, date_dispo, heure_debut, heure_fin, duree_creneau]
+      properties:
+        medecin_id:
+          type: integer
+          example: 1
+        date_dispo:
+          type: string
+          example: "2026-10-10"
+        heure_debut:
+          type: string
+          example: "09:00:00"
+        heure_fin:
+          type: string
+          example: "11:00:00"
+        duree_creneau:
+          type: integer
+          description: Durée d'un créneau, en minutes
+          example: 30
+
+    Disponibilite:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        medecin_id:
+          type: integer
+          example: 1
+        date_dispo:
+          type: string
+          example: "2026-10-10"
+        heure_debut:
+          type: string
+          example: "09:00:00"
+        heure_fin:
+          type: string
+          example: "11:00:00"
+        duree_creneau:
+          type: integer
+          example: 30
 
     ErrorResponse:
       type: object

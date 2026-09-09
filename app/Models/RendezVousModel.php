@@ -78,7 +78,10 @@ class RendezVousModel extends Model
 
     private function withJoins()
     {
-        return $this->select('rendez_vous.*, medecins.nom AS medecin_nom, medecins.prenom AS medecin_prenom, specialites.nom AS specialite_nom')
+        // Colonnes listées explicitement plutôt que "rendez_vous.*" pour ne
+        // pas exposer slot_confirme (colonne générée, détail d'implémentation
+        // de la contrainte anti-double-réservation, pas une donnée métier).
+        return $this->select('rendez_vous.id, rendez_vous.patient_id, rendez_vous.medecin_id, rendez_vous.date_heure, rendez_vous.statut, rendez_vous.created_at, medecins.nom AS medecin_nom, medecins.prenom AS medecin_prenom, specialites.nom AS specialite_nom')
             ->join('medecins', 'medecins.id = rendez_vous.medecin_id')
             ->join('specialites', 'specialites.id = medecins.specialite_id');
     }

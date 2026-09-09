@@ -45,4 +45,24 @@ abstract class BaseController extends Controller
         // Preload any models, libraries, etc, here.
         // $this->session = service('session');
     }
+
+    /**
+     * Pour un PATCH (mise à jour partielle) : ne garde que les champs
+     * effectivement présents dans le corps de la requête, contrairement à
+     * un payload "PUT" qui suppose que tous les champs sont fournis.
+     */
+    protected function presentFields(array $fieldNames): array
+    {
+        $data = [];
+
+        foreach ($fieldNames as $field) {
+            $value = $this->request->getVar($field);
+
+            if ($value !== null) {
+                $data[$field] = $value;
+            }
+        }
+
+        return $data;
+    }
 }

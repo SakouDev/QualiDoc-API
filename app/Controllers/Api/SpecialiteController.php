@@ -37,14 +37,21 @@ class SpecialiteController extends BaseController
             return $this->failNotFound('Spécialité introuvable.');
         }
 
+        $data = $this->presentFields(['nom']);
+
+        if ($data === []) {
+            return $this->fail('Aucun champ à mettre à jour.', 400);
+        }
+
         $rules = $model->validationRules;
         $rules['nom'] .= "|is_unique[specialites.nom,id,{$id}]";
+        $rules = array_intersect_key($rules, $data);
 
-        if (! $this->validate($rules)) {
+        if (! $this->validateData($data, $rules)) {
             return $this->failValidationErrors($this->validator->getErrors());
         }
 
-        $model->update($id, ['nom' => $this->request->getVar('nom')]);
+        $model->update($id, $data);
 
         return $this->respond($model->find($id));
     }

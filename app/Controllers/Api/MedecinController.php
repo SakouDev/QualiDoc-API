@@ -56,11 +56,25 @@ class MedecinController extends BaseController
             return $this->failNotFound('Médecin introuvable.');
         }
 
-        if (! $this->validate($model->validationRules)) {
+        // PATCH : seuls les champs envoyés sont mis à jour (contrairement à
+        // create(), pas besoin que les 3 champs soient tous présents).
+        $data = $this->presentFields(['nom', 'prenom', 'specialite_id']);
+
+        if ($data === []) {
+            return $this->fail('Aucun champ à mettre à jour.', 400);
+        }
+
+        if (isset($data['specialite_id'])) {
+            $data['specialite_id'] = (int) $data['specialite_id'];
+        }
+
+        $rules = array_intersect_key($model->validationRules, $data);
+
+        if (! $this->validateData($data, $rules)) {
             return $this->failValidationErrors($this->validator->getErrors());
         }
 
-        $model->update($id, $this->payload());
+        $model->update($id, $data);
 
         return $this->respond($model->find($id));
     }

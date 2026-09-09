@@ -81,10 +81,21 @@ CREATE TABLE rendez_vous (
   date_heure DATETIME NOT NULL,
   statut ENUM('confirme','annule','honore') NOT NULL DEFAULT 'confirme',
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  -- NULL tant que le RDV n'est pas confirmé : un index UNIQUE ignore les
+  -- doublons de NULL, donc les RDV annulés/honorés ne se bloquent jamais
+  -- entre eux (plusieurs tentatives annulées sur le même créneau, c'est
+  -- normal) — seul un 2e RDV confirmé sur le même médecin+créneau est
+  -- rejeté par la base, filet de sécurité contre une double réservation
+  -- simultanée (le isSlotTaken() du contrôleur fait un SELECT puis un
+  -- INSERT séparés, donc pas atomique à lui seul sous requêtes concurrentes).
+  slot_confirme VARCHAR(60) GENERATED ALWAYS AS (
+    IF(statut = 'confirme', CONCAT(medecin_id, '-', date_heure), NULL)
+  ) STORED,
   FOREIGN KEY (patient_id) REFERENCES patients(id),
   FOREIGN KEY (medecin_id) REFERENCES medecins(id),
   INDEX idx_rdv_patient (patient_id),
-  INDEX idx_rdv_medecin_date (medecin_id, date_heure)
+  INDEX idx_rdv_medecin_date (medecin_id, date_heure),
+  UNIQUE INDEX uniq_rdv_slot_confirme (slot_confirme)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 SET FOREIGN_KEY_CHECKS = 1;

@@ -5,6 +5,7 @@ namespace App\Controllers\Api;
 use App\Controllers\BaseController;
 use App\Libraries\AuthContext;
 use App\Models\RendezVousModel;
+use CodeIgniter\Database\Exceptions\DatabaseException;
 use DateTime;
 
 class RendezVousController extends BaseController
@@ -28,12 +29,22 @@ class RendezVousController extends BaseController
             return $this->fail('Ce créneau n\'est plus disponible pour ce médecin.', 409);
         }
 
-        $id = $model->insert([
-            'patient_id' => AuthContext::id(),
-            'medecin_id' => $medecinId,
-            'date_heure' => $dateHeure,
-            'statut' => 'confirme',
-        ]);
+        // isSlotTaken() ci-dessus n'est qu'un filtre rapide pour un message
+        // clair dans le cas courant : entre ce SELECT et l'INSERT, une autre
+        // requête concurrente peut réserver le même créneau. Le vrai
+        // garde-fou est la contrainte UNIQUE en base (uniq_rdv_slot_confirme)
+        // — si elle se déclenche quand même, on le traduit ici en 409
+        // plutôt que de laisser remonter une 500.
+        try {
+            $id = $model->insert([
+                'patient_id' => AuthContext::id(),
+                'medecin_id' => $medecinId,
+                'date_heure' => $dateHeure,
+                'statut' => 'confirme',
+            ]);
+        } catch (DatabaseException $e) {
+            return $this->fail('Ce créneau n\'est plus disponible pour ce médecin.', 409);
+        }
 
         return $this->respondCreated($model->withMedecin($id));
     }

@@ -5,6 +5,14 @@ use CodeIgniter\Router\RouteCollection;
 /** @var RouteCollection $routes */
 
 $routes->group('api', ['namespace' => 'App\Controllers\Api'], static function (RouteCollection $routes) {
+    // Préflight CORS : le navigateur envoie OPTIONS avant chaque requête
+    // cross-origin non "simple" (JSON, Authorization...). CI4 ne génère pas
+    // cette route automatiquement, il faut la déclarer explicitement pour
+    // que le filtre "cors" (global) puisse répondre avec les bons headers.
+    $routes->options('(:any)', static function () {
+        return service('response')->setStatusCode(204);
+    });
+
     $routes->post('auth/register', 'AuthController::register');
     $routes->post('auth/login', 'AuthController::login');
 

@@ -28,11 +28,11 @@ $routes->group('api', ['namespace' => 'App\Controllers\Api'], static function (R
 
     $routes->group('admin', ['filter' => ['jwt', 'admin']], static function (RouteCollection $routes) {
         $routes->post('medecins', 'MedecinController::create');
-        $routes->put('medecins/(:num)', 'MedecinController::update/$1');
+        $routes->patch('medecins/(:num)', 'MedecinController::update/$1');
         $routes->delete('medecins/(:num)', 'MedecinController::delete/$1');
 
         $routes->post('specialites', 'SpecialiteController::create');
-        $routes->put('specialites/(:num)', 'SpecialiteController::update/$1');
+        $routes->patch('specialites/(:num)', 'SpecialiteController::update/$1');
         $routes->delete('specialites/(:num)', 'SpecialiteController::delete/$1');
 
         $routes->get('rendez-vous', 'RendezVousController::adminIndex');

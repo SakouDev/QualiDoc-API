@@ -405,9 +405,9 @@ paths:
                 $ref: '#/components/schemas/ErrorResponse'
 
   /admin/medecins/{id}:
-    put:
+    patch:
       tags: [Admin - Médecins]
-      summary: Modifier un médecin
+      summary: Modifier un médecin (mise à jour partielle)
       security:
         - bearerAuth: []
       parameters:
@@ -421,7 +421,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/MedecinRequest'
+              $ref: '#/components/schemas/MedecinPatchRequest'
       responses:
         '200':
           description: Médecin modifié
@@ -429,6 +429,12 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Medecin'
+        '400':
+          description: Aucun champ à mettre à jour, ou erreur de validation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
         '404':
           description: Médecin introuvable
           content:
@@ -489,9 +495,9 @@ paths:
                 $ref: '#/components/schemas/ErrorResponse'
 
   /admin/specialites/{id}:
-    put:
+    patch:
       tags: [Admin - Spécialités]
-      summary: Modifier une spécialité
+      summary: Modifier une spécialité (mise à jour partielle)
       security:
         - bearerAuth: []
       parameters:
@@ -505,7 +511,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/SpecialiteRequest'
+              $ref: '#/components/schemas/SpecialitePatchRequest'
       responses:
         '200':
           description: Spécialité modifiée
@@ -513,6 +519,12 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Specialite'
+        '400':
+          description: Aucun champ à mettre à jour, ou erreur de validation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
         '404':
           description: Spécialité introuvable
           content:
@@ -659,6 +671,28 @@ components:
     SpecialiteRequest:
       type: object
       required: [nom]
+      properties:
+        nom:
+          type: string
+          example: Ophtalmologue
+
+    MedecinPatchRequest:
+      type: object
+      description: Tous les champs sont optionnels — seuls ceux envoyés sont modifiés.
+      properties:
+        nom:
+          type: string
+          example: Durand
+        prenom:
+          type: string
+          example: Jean
+        specialite_id:
+          type: integer
+          example: 1
+
+    SpecialitePatchRequest:
+      type: object
+      description: Tous les champs sont optionnels — seuls ceux envoyés sont modifiés.
       properties:
         nom:
           type: string

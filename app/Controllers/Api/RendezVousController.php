@@ -74,6 +74,24 @@ class RendezVousController extends BaseController
         return $this->respond($model->withMedecin($id));
     }
 
+    public function adminDelete($id)
+    {
+        $model = new RendezVousModel();
+        $rdv = $model->find($id);
+
+        if ($rdv === null) {
+            return $this->failNotFound('Rendez-vous introuvable.');
+        }
+
+        if ($rdv['statut'] !== 'confirme') {
+            return $this->fail('Ce rendez-vous ne peut plus être annulé.', 409);
+        }
+
+        $model->update($id, ['statut' => 'annule']);
+
+        return $this->respond($model->withMedecin($id));
+    }
+
     public function adminIndex()
     {
         $model = new RendezVousModel();

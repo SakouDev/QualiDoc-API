@@ -304,6 +304,38 @@ paths:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
 
+  /admin/rendez-vous/{id}:
+    delete:
+      tags: [Admin - Rendez-vous]
+      summary: Annuler un rendez-vous (n'importe quel patient)
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Rendez-vous annulé
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RendezVous'
+        '404':
+          description: Rendez-vous introuvable
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '409':
+          description: Ce rendez-vous ne peut plus être annulé (déjà annulé ou honoré)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
   /admin/disponibilites:
     get:
       tags: [Admin - Disponibilités]

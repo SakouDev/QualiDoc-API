@@ -5,6 +5,7 @@ namespace App\Controllers\Api;
 use App\Controllers\BaseController;
 use App\Models\DisponibiliteModel;
 use App\Models\MedecinModel;
+use App\Models\RendezVousModel;
 use DateTime;
 
 class MedecinController extends BaseController
@@ -87,8 +88,14 @@ class MedecinController extends BaseController
             return $this->failNotFound('Médecin introuvable.');
         }
 
+        // Un RDV annulé ne représente aucune visite réelle — seuls les RDV
+        // confirmés (à venir) ou honorés (déjà eu lieu) doivent bloquer la
+        // suppression.
         $db = db_connect();
-        $hasRdv = $db->table('rendez_vous')->where('medecin_id', $id)->countAllResults() > 0;
+        $hasRdv = $db->table('rendez_vous')
+            ->where('medecin_id', $id)
+            ->whereIn('statut', ['confirme', 'honore'])
+            ->countAllResults() > 0;
 
         if ($hasRdv) {
             return $this->fail('Impossible de supprimer : ce médecin a des rendez-vous enregistrés.', 409);
@@ -99,6 +106,13 @@ class MedecinController extends BaseController
         // bloquer sa suppression (pas de contrainte ON DELETE CASCADE en
         // base, donc on les supprime explicitement avant).
         (new DisponibiliteModel())->where('medecin_id', $id)->delete();
+
+        // Idem pour les RDV annulés : ils ne bloquent pas la suppression
+        // (cf. check ci-dessus) mais existent toujours en ligne et
+        // référencent le médecin par clé étrangère — il faut les supprimer
+        // explicitement, sinon la contrainte FK rejette quand même le
+        // DELETE du médecin.
+        (new RendezVousModel())->where('medecin_id', $id)->delete();
 
         $model->delete($id);
 

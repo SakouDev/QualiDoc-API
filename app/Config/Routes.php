@@ -36,6 +36,7 @@ $routes->group('api', ['namespace' => 'App\Controllers\Api'], static function (R
         $routes->delete('specialites/(:num)', 'SpecialiteController::delete/$1');
 
         $routes->get('rendez-vous', 'RendezVousController::adminIndex');
+        $routes->delete('rendez-vous/(:num)', 'RendezVousController::adminDelete/$1');
 
         $routes->get('disponibilites', 'DisponibiliteController::index');
         $routes->post('disponibilites', 'DisponibiliteController::create');

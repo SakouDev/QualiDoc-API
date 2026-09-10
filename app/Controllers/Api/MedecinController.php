@@ -89,11 +89,16 @@ class MedecinController extends BaseController
 
         $db = db_connect();
         $hasRdv = $db->table('rendez_vous')->where('medecin_id', $id)->countAllResults() > 0;
-        $hasDispo = $db->table('disponibilites')->where('medecin_id', $id)->countAllResults() > 0;
 
-        if ($hasRdv || $hasDispo) {
-            return $this->fail('Impossible de supprimer : ce médecin a des rendez-vous ou des disponibilités enregistrés.', 409);
+        if ($hasRdv) {
+            return $this->fail('Impossible de supprimer : ce médecin a des rendez-vous enregistrés.', 409);
         }
+
+        // Les disponibilités ne sont qu'un planning, pas un historique à
+        // protéger — elles disparaissent avec le médecin plutôt que de
+        // bloquer sa suppression (pas de contrainte ON DELETE CASCADE en
+        // base, donc on les supprime explicitement avant).
+        (new DisponibiliteModel())->where('medecin_id', $id)->delete();
 
         $model->delete($id);
 

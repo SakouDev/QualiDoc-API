@@ -1,0 +1,50 @@
+services:
+  db:
+    image: mariadb:11
+    command: --character-set-server=utf8mb4 --collation-server=utf8mb4_general_ci
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: qualidoc
+    volumes:
+      - qualidoc_db_data:/var/lib/mysql
+      - ./database/schema.sql:/docker-entrypoint-initdb.d/schema.sql:ro
+    healthcheck:
+      test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    networks:
+      - qualidoc
+
+  api:
+    build: .
+    ports:
+      - "8080:8080"
+    environment:
+      # CodeIgniter (BaseConfig) lit $_ENV, qui elle-même transforme les
+      # points en underscores lors de l'import des vraies variables d'env
+      # du process (comportement de PHP, pas de CI4) — donc on utilise la
+      # forme "database_default_hostname" plutôt que "database.default.hostname",
+      # que CI4 sait aussi reconnaître pour ce cas précis.
+      CI_ENVIRONMENT: development
+      app_baseURL: "http://localhost:8080/"
+      database_default_hostname: db
+      database_default_database: qualidoc
+      database_default_username: root
+      database_default_password: root
+      database_default_DBDriver: MySQLi
+      database_default_port: 3306
+      JWT_SECRET: docker-demo-secret-change-me-9f8e7d6c5b4a3928176e5d4c3b2a1908f7e6d5c4b3a2918
+      JWT_EXPIRY: 1296000
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - qualidoc
+
+networks:
+  qualidoc:
+    external: true
+
+volumes:
+  qualidoc_db_data:

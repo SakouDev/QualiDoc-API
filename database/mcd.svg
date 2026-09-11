@@ -1,19 +1,19 @@
-<svg width="680" height="640" viewBox="0 0 680 640" xmlns="http://www.w3.org/2000/svg" role="img" font-family="system-ui, -apple-system, 'Segoe UI', sans-serif">
+<svg width="680" height="660" viewBox="0 0 680 660" xmlns="http://www.w3.org/2000/svg" role="img" font-family="system-ui, -apple-system, 'Segoe UI', sans-serif">
 <title>MCD QualiDoc</title>
 <desc>Modele conceptuel de donnees : entites Patient, Medecin, Specialite, Disponibilite reliees par les associations Prendre rdv, Avoir, Proposer avec leurs cardinalites.</desc>
-<rect width="680" height="640" fill="#ffffff"/>
+<rect width="680" height="660" fill="#ffffff"/>
 
 <line x1="340" y1="114" x2="340" y2="154" stroke="#B4B2A9" stroke-width="1"/>
 <line x1="340" y1="186" x2="340" y2="226" stroke="#B4B2A9" stroke-width="1"/>
 <line x1="340" y1="326" x2="150" y2="366" stroke="#B4B2A9" stroke-width="1"/>
 <line x1="340" y1="326" x2="530" y2="366" stroke="#B4B2A9" stroke-width="1"/>
-<line x1="150" y1="422" x2="150" y2="462" stroke="#B4B2A9" stroke-width="1"/>
+<line x1="150" y1="440" x2="150" y2="480" stroke="#B4B2A9" stroke-width="1"/>
 <line x1="530" y1="410" x2="530" y2="450" stroke="#B4B2A9" stroke-width="1"/>
 
 <text x="348" y="132" font-size="12" fill="#5F5E5A">(0,n)</text>
 <text x="348" y="218" font-size="12" fill="#5F5E5A">(1,1)</text>
 <text x="230" y="349" font-size="12" fill="#5F5E5A" text-anchor="end">(0,n)</text>
-<text x="110" y="454" font-size="12" fill="#5F5E5A">(0,n)</text>
+<text x="110" y="472" font-size="12" fill="#5F5E5A">(0,n)</text>
 <text x="400" y="339" font-size="12" fill="#5F5E5A">(0,n)</text>
 <text x="536" y="432" font-size="12" fill="#5F5E5A">(1,1)</text>
 
@@ -40,9 +40,10 @@
 </g>
 
 <g>
-  <rect x="65" y="366" width="170" height="56" rx="20" fill="#F1EFE8" stroke="#5F5E5A" stroke-width="1"/>
+  <rect x="55" y="366" width="190" height="74" rx="20" fill="#F1EFE8" stroke="#5F5E5A" stroke-width="1"/>
   <text x="150" y="389" font-size="14" font-weight="600" fill="#2C2C2A" text-anchor="middle">Prendre rdv</text>
-  <text x="150" y="407" font-size="12" fill="#444441" text-anchor="middle">date_heure, statut</text>
+  <text x="150" y="405" font-size="12" fill="#444441" text-anchor="middle">date_heure, statut,</text>
+  <text x="150" y="421" font-size="12" fill="#444441" text-anchor="middle">slot_confirme, rappel_envoye</text>
 </g>
 
 <g>
@@ -51,15 +52,15 @@
 </g>
 
 <g>
-  <rect x="55" y="462" width="190" height="150" rx="4" fill="#E6F1FB" stroke="#185FA5" stroke-width="1"/>
-  <text x="150" y="485" font-size="14" font-weight="600" fill="#0C447C" text-anchor="middle">Patient</text>
-  <line x1="65" y1="488" x2="235" y2="488" stroke="#185FA5" stroke-width="0.5"/>
-  <text x="71" y="511" font-size="12" fill="#0C447C" text-decoration="underline">id</text>
-  <text x="71" y="527" font-size="12" fill="#0C447C">nom</text>
-  <text x="71" y="543" font-size="12" fill="#0C447C">prenom</text>
-  <text x="71" y="559" font-size="12" fill="#0C447C">email</text>
-  <text x="71" y="575" font-size="12" fill="#0C447C">password_hash</text>
-  <text x="71" y="591" font-size="12" fill="#0C447C">admin</text>
+  <rect x="55" y="480" width="190" height="150" rx="4" fill="#E6F1FB" stroke="#185FA5" stroke-width="1"/>
+  <text x="150" y="503" font-size="14" font-weight="600" fill="#0C447C" text-anchor="middle">Patient</text>
+  <line x1="65" y1="506" x2="235" y2="506" stroke="#185FA5" stroke-width="0.5"/>
+  <text x="71" y="529" font-size="12" fill="#0C447C" text-decoration="underline">id</text>
+  <text x="71" y="545" font-size="12" fill="#0C447C">nom</text>
+  <text x="71" y="561" font-size="12" fill="#0C447C">prenom</text>
+  <text x="71" y="577" font-size="12" fill="#0C447C">email</text>
+  <text x="71" y="593" font-size="12" fill="#0C447C">password_hash</text>
+  <text x="71" y="609" font-size="12" fill="#0C447C">admin</text>
 </g>
 
 <g>

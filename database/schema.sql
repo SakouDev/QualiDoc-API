@@ -80,6 +80,7 @@ CREATE TABLE rendez_vous (
   medecin_id INT UNSIGNED NOT NULL,
   date_heure DATETIME NOT NULL,
   statut ENUM('confirme','annule','honore') NOT NULL DEFAULT 'confirme',
+  rappel_envoye BOOLEAN NOT NULL DEFAULT FALSE,
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   -- NULL tant que le RDV n'est pas confirmé : un index UNIQUE ignore les
   -- doublons de NULL, donc les RDV annulés/honorés ne se bloquent jamais

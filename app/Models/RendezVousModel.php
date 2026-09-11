@@ -10,7 +10,7 @@ class RendezVousModel extends Model
     protected $primaryKey = 'id';
     protected $returnType = 'array';
     protected $useTimestamps = false;
-    protected $allowedFields = ['patient_id', 'medecin_id', 'date_heure', 'statut'];
+    protected $allowedFields = ['patient_id', 'medecin_id', 'date_heure', 'statut', 'rappel_envoye'];
 
     /**
      * Format d'échange front -> API pour date_heure : 'Y-m-d H:i:s'
@@ -74,6 +74,25 @@ class RendezVousModel extends Model
         }
 
         return $builder->orderBy('rendez_vous.date_heure', 'DESC')->findAll();
+    }
+
+    /**
+     * RDV confirmés dont le rappel n'a pas encore été envoyé et qui ont
+     * lieu dans les prochaines 24h — c'est la fenêtre glissante balayée
+     * par la commande spark rappels:envoyer (censée tourner une fois par
+     * jour via un cron).
+     */
+    public function aRappeler(): array
+    {
+        return $this->select('rendez_vous.id, rendez_vous.date_heure, patients.email AS patient_email, patients.nom AS patient_nom, patients.prenom AS patient_prenom, medecins.nom AS medecin_nom, medecins.prenom AS medecin_prenom, specialites.nom AS specialite_nom')
+            ->join('patients', 'patients.id = rendez_vous.patient_id')
+            ->join('medecins', 'medecins.id = rendez_vous.medecin_id')
+            ->join('specialites', 'specialites.id = medecins.specialite_id')
+            ->where('rendez_vous.statut', 'confirme')
+            ->where('rendez_vous.rappel_envoye', 0)
+            ->where('rendez_vous.date_heure >=', date('Y-m-d H:i:s'))
+            ->where('rendez_vous.date_heure <=', date('Y-m-d H:i:s', strtotime('+24 hours')))
+            ->findAll();
     }
 
     private function withJoins()
